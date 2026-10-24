@@ -329,6 +329,25 @@ class Flasher:
             sess.close()
         return peak[0]
 
+    def read_settings(self):
+        """Reads every ESC's parameters without writing anything.
+        Returns ({nid: info}, {nid: {name: (kind, value)}})."""
+        sess = Session(self.port, self.bitrate, self.local_id)
+        try:
+            self.ui.status("Searching for the drone's CAN bus...")
+            seen = self._find_bus(sess)
+            self.ui.log(f"Bus is at {sess.bitrate} bit/s; nodes {sorted(seen)}")
+            escs = self._find_escs(sess, seen)
+            self.ui.status("Reading current parameters...")
+            params = {}
+            for nid in escs:
+                self._check_cancel()
+                params[nid] = sess.read_params(nid)
+            return escs, params
+        finally:
+            self.bitrate = sess.bitrate
+            sess.close()
+
     def _scan(self, sess, seconds):
         seen = {}
         for nid, msg in sess.listen(dronecan.uavcan.protocol.NodeStatus, seconds):
