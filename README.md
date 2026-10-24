@@ -23,6 +23,10 @@ Runs on native Linux and on WSL2.
 
 If both are plugged in, the Babel is used; pick the other with `--port`.
 
+The CAN bus needs a 120 Ω terminator at each end. With the flight controller removed, a bench
+drone may have none: a PEAK adapter has no built-in termination, and without it the tool sees no
+traffic at any bitrate. Put 120 Ω across CAN_H and CAN_L at the adapter end.
+
 ## Setup
 
 ### Native Linux
